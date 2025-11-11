@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greibach Normal Form (GNF) Presentation</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* --- Basic Setup --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        main {
+            max-width: 1280px;
+            margin: 20px auto;
+        }
+
+        .presentation-header {
+            max-width: 1280px;
+            margin: 0 auto 20px auto; /* 0 top, auto sides, 20px bottom */
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .presentation-header p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            font-weight: 500;
+            color: #004a7c;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            color: #004a7c; /* Deep Blue */
+            margin-bottom: 20px;
+        }
+
+        /* --- Section Styling (replaces .slide) --- */
+        .content-section {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px 60px;
+            margin-bottom: 40px;
+        }
+
+        /* --- Content Styling --- */
+        .content-section h1 {
+            font-size: 72px;
+            color: #004a7c;
+        }
+        
+        .content-section h2 {
+            font-size: 48px;
+            color: #004a7c;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            border-bottom: 4px solid #00bfa5; /* Teal Accent */
+            width: 100%;
+        }
+
+        .content-section p, .content-section li {
+            font-size: 22px;
+            line-height: 1.6;
+            color: #334155;
+        }
+
+        .content-section .subtitle {
+            font-size: 30px;
+            font-weight: 500;
+            color: #0077b6; /* Lighter Blue */
+            margin-top: -10px;
+        }
+
+        /* --- Special Layouts --- */
+        .title-section {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(135deg, #004a7c 0%, #0077b6 100%);
+            padding: 60px;
+        }
+        .title-section h1 {
+            color: #fff;
+            font-size: 84px;
+        }
+        .title-section .subtitle {
+            color: #cceeff;
+            font-size: 32px;
+        }
+
+        .content-split {
+            display: flex;
+            width: 100%;
+            gap: 40px;
+            align-items: flex-start;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+
+        .content-split > div {
+            flex: 1;
+            min-width: 300px; /* Prevent over-squishing */
+        }
+
+        /* --- List Styles --- */
+        ul, ol {
+            margin-left: 40px;
+            width: 100%;
+            padding-right: 20px; /* Ensure content doesn't touch edge */
+        }
+
+        li {
+            margin-bottom: 20px;
+        }
+
+        li strong {
+            color: #0077b6;
+            font-weight: 500;
+        }
+
+        /* --- Grammar Box --- */
+        .grammar-box, pre {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-left: 6px solid #00bfa5; /* Teal Accent */
+            border-radius: 8px;
+            padding: 24px;
+            margin: 20px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 26px;
+            line-height: 1.7;
+            color: #212529;
+            width: 100%;
+            white-space: pre-wrap; /* Allow wrapping */
+            overflow-x: auto; /* Allow horizontal scroll if needed */
+        }
+        
+        pre {
+            font-size: 22px;
+        }
+
+        .grammar-box.half {
+            width: 80%;
+        }
+
+        .grammar-box strong {
+            color: #d90429; /* Red for emphasis */
+        }
+        
+        .grammar-box .good {
+            color: #008000; /* Green for good */
+        }
+
+        .grammar-box .comment {
+            color: #6a737d; /* Gray for comments */
+            font-style: italic;
+            font-size: 22px;
+        }
+
+        /* --- Step-by-Step Box --- */
+        .step-box {
+            background: #e6f7ff;
+            border: 1px solid #b3e0ff;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .step-box h3 {
+            font-size: 30px;
+            color: #0056b3;
+            margin-bottom: 15px;
+        }
+        
+        .step-box p {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .step-box .highlight {
+            background: #fff3cd;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .step-box .formula {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 22px;
+            font-weight: 600;
+            color: #c92a2a;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="presentation-header">
+        <p>Naman Bordia | USN: 1RVU23CSE296</p>
+        <p>Poorna V M | USN: 1RVU23CSE336</p>
+    </header>
+
+    <main id="presentation-content">
+
+        <!-- Slide 1: Title Slide -->
+        <section class="content-section title-section">
+            <h1>Greibach Normal Form</h1>
+            <p class="subtitle">A Step-by-Step Guide to CFG Conversion</p>
+        </section>
+
+        <!-- Slide 2: What is GNF? -->
+        <section class="content-section">
+            <h2>What is Greibach Normal Form (GNF)?</h2>
+            <p>A Context-Free Grammar (CFG) is in GNF if all production rules follow one simple format:</p>
+            
+            <div class="grammar-box" style="text-align: center; font-size: 36px; padding: 40px 0;">
+                A &rarr; a&alpha;
+            </div>
+
+            <ul>
+                <li><strong>A</strong> is a non-terminal variable (e.g., S, X, A)</li>
+                <li><strong>a</strong> is a <strong>single terminal</strong> symbol (e.g., '0', '1', 'b')</li>
+                <li><strong>&alpha;</strong> (alpha) is a string of <strong>zero or more</strong> non-terminals (e.g., &epsilon;, B, CB, A<sub>1</sub>A<sub>2</sub>)</li>
+            </ul>
+        </section>
+
+        <!-- Slide 3: Conversion Rules -->
+        <section class="content-section">
+            <h2>How to Convert CFG to GNF</h2>
+            <p>We must follow a strict set of rules, in order:</p>
+            <ol>
+                <li>
+                    <strong>Simplify the Grammar</strong>
+                    <p style="font-size: 20px;">Remove useless symbols, &epsilon;-productions, and unit productions.</p>
+                </li>
+                <li>
+                    <strong>Convert to Chomsky Normal Form (CNF)</strong>
+                    <p style="font-size: 20px;">All rules must be in the form <strong>A &rarr; BC</strong> or <strong>A &rarr; a</strong>.</p>
+                </li>
+                <li>
+                    <strong>Rename Non-Terminals</strong>
+                    <p style="font-size: 20px;">Rename all variables to A<sub>1</sub>, A<sub>2</sub>, A<sub>3</sub>, ... A<sub>n</sub>, with the Start Symbol (S) always as <strong>A<sub>1</sub></strong>.</p>
+                </li>
+                <li>
+                    <strong>Substitute Productions</strong>
+                    <p style="font-size: 20px;">Iterate from i=1 to n, ensuring all rules A<sub>i</sub> start with a terminal. This is where we use the main substitution rules.</p>
+                </li>
+            </ol>
+        </section>
+
+        <!-- Slide 4: Rule 1: Simplified Grammar -->
+        <section class="content-section">
+            <h2>Rule 1: Simplified Grammar</h2>
+            <p>Before starting, the grammar must be "clean." We must remove:</p>
+            <ul style="list-style-type: none; margin-left: 0; margin-top: 20px;">
+                <li style="display: flex; align-items: center; margin-bottom: 25px;">
+                    <i class="fa-solid fa-trash" style="color: #d90429; margin-right: 15px; width: 30px; font-size: 24px;"></i>
+                    <strong>Useless Symbols:</strong> Variables that can never be reached from the Start Symbol (S) or can never produce a terminal string.
+                </li>
+                <li style="display: flex; align-items: center; margin-bottom: 25px;">
+                    <i class="fa-solid fa-ban" style="color: #d90429; margin-right: 15px; width: 30px; font-size: 24px;"></i>
+                    <strong>&epsilon;-Productions (Null):</strong> Rules like <strong>A &rarr; &epsilon;</strong> (unless it's S &rarr; &epsilon; and S is not on the right side of any rule).
+                </li>
+                <li style="display: flex; align-items: center; margin-bottom: 25px;">
+                    <i class="fa-solid fa-exchange-alt" style="color: #d90429; margin-right: 15px; width: 30px; font-size: 24px;"></i>
+                    <strong>Unit Productions:</strong> Rules with only one non-terminal on the right, like <strong>A &rarr; B</strong>.
+                </li>
+            </ul>
+        </section>
+
+        <!-- Slide 5: Rule 2: Chomsky Normal Form (CNF) -->
+        <section class="content-section">
+            <h2>Rule 2: Chomsky Normal Form (CNF)</h2>
+            <p>After simplifying, all rules must fit one of two forms. This makes the next steps predictable.</p>
+            <div class="content-split" style="align-items: center; margin-top: 40px;">
+                <div class="grammar-box" style="text-align: center;">
+                    <h3 style="margin-bottom: 15px;">Form 1: Two Non-Terminals</h3>
+                    <span style="font-size: 36px;">A &rarr; BC</span>
+                </div>
+                <div class="grammar-box" style="text-align: center;">
+                    <h3 style="margin-bottom: 15px;">Form 2: One Terminal</h3>
+                    <span style="font-size: 36px;">A &rarr; a</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Rule 4: The Substitution Rules -->
+        <section class="content-section">
+            <h2>Rule 4: The Substitution Rules</h2>
+            <p>We process all productions A<sub>i</sub> in order (i=1, 2, 3...). For any rule of the form <strong>A<sub>i</sub> &rarr; A<sub>j</sub>&alpha;</strong>:</p>
+            
+            <div class="step-box" style="background-color: #e6fffa; margin-top: 30px;">
+                <h3 style="color: #008a70;">Case 1: i &lt; j</h3>
+                <p>Example: <span class="highlight">A<sub>1</sub> &rarr; A<sub>3</sub>BC</span></p>
+                <p><strong>Action: Leave it as-is for now.</strong> We will fix this later with back-substitution.</p>
+            </div>
+
+            <div class="step-box" style="background-color: #fff4e6; margin-top: 30px;">
+                <h3 style="color: #d95b00;">Case 2: i &gt; j</h3>
+                <p>Example: <span class="highlight">A<sub>3</sub> &rarr; A<sub>1</sub>BC</span></p>
+                <p><strong>Action: Substitute A<sub>j</sub>.</strong> Replace A<sub>1</sub> with all of its productions.</p>
+            </div>
+
+            <div class="step-box" style="background-color: #ffeeee; margin-top: 30px;">
+                <h3 style="color: #d90429;">Case 3: i = j</h3>
+                <p>Example: <span class="highlight">A<sub>3</sub> &rarr; A<sub>3</sub>BC</span></p>
+                <p><strong>Action: This is Left Recursion.</strong> We must eliminate it immediately.</p>
+            </div>
+        </section>
+
+        <!-- Slide 7: Eliminating Left Recursion -->
+        <section class="content-section">
+            <h2>Eliminating Left Recursion (i = j)</h2>
+            <p>If we have a rule with immediate left recursion:</p>
+            
+            <div class="grammar-box half" style="border-color: #d90429;">
+                A &rarr; A&alpha; | &beta;
+                <div class="comment" style="margin-top: 10px;">
+                    (&alpha; is the part after A, &beta; is everything else that doesn't start with A)
+                </div>
+            </div>
+
+            <p>We replace it with <strong>two new sets of rules</strong>, using a new variable (A'):</p>
+            
+             <div class="grammar-box half" style="border-color: #004a7c;">
+                <strong>Standard Formula:</strong><br>
+                A &rarr; &beta;A' <br>
+                A' &rarr; &alpha;A' | &epsilon;
+            </div>
+        </section>
+        
+        <!-- Slide 8: Example 1 - The Problem -->
+        <section class="content-section">
+            <h2>Example 1: The Problem</h2>
+            <p>Convert the following CFG (assumed simplified and in CNF) to GNF:</p>
+            <div class="grammar-box">
+                S &rarr; AA | 0
+                <br>
+                A &rarr; SS | 1
+            </div>
+        </section>
+
+        <!-- Slide 9: Example 1 - Solution 1 -->
+        <section class="content-section">
+            <h2>Example 1: Solution (Step 1)</h2>
+            <div class="step-box">
+                <h3>Step 1: Rename Non-Terminals</h3>
+                <p>The Start Symbol (S) must be A<sub>1</sub>.</p>
+                <pre>
+S = A<sub>1</sub>
+A = A<sub>2</sub>
+                </pre>
+                <p>The new grammar is:</p>
+                <pre>
+A<sub>1</sub> &rarr; A<sub>2</sub>A<sub>2</sub> | 0     <span class="comment">(A<sub>1</sub> &rarr; 0 is already in GNF)</span>
+A<sub>2</sub> &rarr; A<sub>1</sub>A<sub>1</sub> | 1     <span class="comment">(A<sub>2</sub> &rarr; 1 is already in GNF)</span>
+                </pre>
+            </div>
+        </section>
+        
+        <!-- Slide 10: Example 1 - Solution 2 -->
+        <section class="content-section">
+            <h2>Example 1: Solution (Step 2)</h2>
+            <div class="step-box">
+                <h3>Step 2: Process A<sub>1</sub> (i = 1)</h3>
+                <p>We check the rules for A<sub>1</sub>:</p>
+                <pre>
+A<sub>1</sub> &rarr; A<sub>2</sub>A<sub>2</sub>     <span class="comment">(Rule: A<sub>i</sub> &rarr; A<sub>j</sub>&alpha;)</span>
+                </pre>
+                <ul>
+                    <li>Here, <strong>i = 1</strong> and <strong>j = 2</strong>.</li>
+                    <li>Since <strong>i &lt; j</strong>, this rule is fine. We <strong>leave it as-is</strong> for now.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Slide 11: Example 1 - Solution 3 -->
+        <section class="content-section">
+            <h2>Example 1: Solution (Step 3)</h2>
+            <div class="step-box">
+                <h3>Step 3: Process A<sub>2</sub> (i = 2)</h3>
+                <p>We check the rules for A<sub>2</sub>:</p>
+                <pre>
+A<sub>2</sub> &rarr; A<sub>1</sub>A<sub>1</sub>     <span class="comment">(Rule: A<sub>i</sub> &rarr; A<sub>j</sub>&alpha;)</span>
+                </pre>
+                <ul>
+                    <li>Here, <strong>i = 2</strong> and <strong>j = 1</strong>.</li>
+                    <li>Since <strong>i &gt; j</strong>, we must <strong>substitute A<sub>1</sub></strong>.</li>
+                </ul>
+                <p>We replace <span class="highlight">A<sub>1</sub></span> with its productions (<span class="highlight">A<sub>2</sub>A<sub>2</sub> | 0</span>):</p>
+                <pre>
+A<sub>2</sub> &rarr; (<strong>A<sub>2</sub>A<sub>2</sub> | 0</strong>)A<sub>1</sub> | 1
+                </pre>
+                <p>This gives us the new rules for A<sub>2</sub>:</p>
+                <pre class="formula">
+A<sub>2</sub> &rarr; A<sub>2</sub>A<sub>2</sub>A<sub>1</sub> | 0A<sub>1</sub> | 1
+                </pre>
+            </div>
+        </section>
+
+        <!-- Slide 12: Example 1 - Solution 4 -->
+        <section class="content-section">
+            <h2>Example 1: Solution (Step 4)</h2>
+            <div class="step-box">
+                <h3>Step 4: Eliminate Left Recursion in A<sub>2</sub></h3>
+                <p>Our A<sub>2</sub> rules have a problem:</p>
+                <pre>
+A<sub>2</sub> &rarr; <strong>A<sub>2</sub></strong>A<sub>2</sub>A<sub>1</sub> | 0A<sub>1</sub> | 1
+                </pre>
+                <p>This is in the form <span class="highlight">A &rarr; A&alpha; | &beta;</span> where:</p>
+                <ul>
+                    <li>A = A<sub>2</sub></li>
+                    <li>&alpha; = A<sub>2</sub>A<sub>1</sub></li>
+                    <li>&beta; = 0A<sub>1</sub> | 1</li>
+                </ul>
+                <p>We apply the formula (using new variable <strong>Z</strong> or <strong>A<sub>2</sub>'</strong>):</p>
+                <pre>
+A &rarr; &beta;Z
+Z &rarr; &alpha;Z | &epsilon;
+                </pre>
+                <p>Our new GNF-compliant rules for A<sub>2</sub> are:</p>
+                <pre class="formula">
+A<sub>2</sub> &rarr; 0A<sub>1</sub>Z | 1Z
+Z &rarr; A<sub>2</sub>A<sub>1</sub>Z | &epsilon;
+                </pre>
+            </div>
+        </section>
+
+        <!-- Slide 13: Example 1 - Solution 5 -->
+        <section class="content-section">
+            <h2>Example 1: Solution (Step 5)</h2>
+            <div class="step-box">
+                <h3>Step 5: Back-Substitution</h3>
+                <p>Our A<sub>1</sub> rule (<span class="highlight">A<sub>1</sub> &rarr; A<sub>2</sub>A<sub>2</sub></span>) is still not in GNF. We must substitute our new GNF rules for A<sub>2</sub>.</p>
+                <pre>
+A<sub>1</sub> &rarr; (<strong>0A<sub>1</sub>Z | 1Z</strong>)A<sub>2</sub> | 0
+                </pre>
+                <p>Our Z rule (<span class="highlight">Z &rarr; A<sub>2</sub>A<sub>1</sub>Z</span>) is also not in GNF. We substitute A<sub>2</sub> again.</p>
+                <pre>
+Z &rarr; (<strong>0A<sub>1</sub>Z | 1Z</strong>)A<sub>1</sub>Z | &epsilon;
+                </pre>
+            </div>
+        </section>
+
+        <!-- Slide 14: Example 1 - Final GNF -->
+        <section class="content-section">
+            <h2>Example 1: Final GNF Grammar</h2>
+            <p>After all substitutions, this is the final grammar in Greibach Normal Form.</p>
+            <div class="grammar-box">
+                <span class="good">A<sub>1</sub> &rarr; 0A<sub>1</sub>ZA<sub>2</sub> | 1ZA<sub>2</sub> | 0</span>
+                <br>
+                <span class="good">A<sub>2</sub> &rarr; 0A<sub>1</sub>Z | 1Z</span>
+                <br>
+                <span class="good">Z &rarr; 0A<sub>1</sub>ZA<sub>1</sub>Z | 1ZA<sub>1</sub>Z | &epsilon;</span>
+            </div>
+            <p style="margin-top: 20px;">(Note: The &epsilon;-production can be removed by substituting Z in all rules, creating more productions, but this form is the direct result of the algorithm.)</p>
+        </section>
+
+        <!-- Slide 15: Example 2 - The Problem -->
+        <section class="content-section">
+            <h2>Example 2: The Problem</h2>
+            <p>Convert the following CFG (assumed simplified and in CNF) to GNF:</p>
+            <div class="grammar-box">
+                S &rarr; CA | BB
+                <br>
+                B &rarr; b | SB
+                <br>
+                C &rarr; b
+                <br>
+                A &rarr; a
+            </div>
+        </section>
+        
+        <!-- Slide 16: Example 2 - Solution 1 -->
+        <section class="content-section">
+            <h2>Example 2: Solution (Step 1)</h2>
+            <div class="step-box">
+                <h3>Step 1: Rename Non-Terminals</h3>
+                <p>S must be A<sub>1</sub>. We can order the rest (e.g., S, C, A, B).</p>
+                <pre>
+S = A<sub>1</sub>
+C = A<sub>2</sub>
+A = A<sub>3</sub>
+B = A<sub>4</sub>
+                </pre>
+                <p>The new grammar is:</p>
+                <pre>
+A<sub>1</sub> &rarr; A<sub>2</sub>A<sub>3</sub> | A<sub>4</sub>A<sub>4</sub>
+A<sub>4</sub> &rarr; b | A<sub>1</sub>A<sub>4</sub>      <span class="comment">(A<sub>4</sub> &rarr; b is GNF)</span>
+A<sub>2</sub> &rarr; b              <span class="comment">(Already GNF)</span>
+A<sub>3</sub> &rarr; a              <span class="comment">(Already GNF)</span>
+                </pre>
+            </div>
+        </section>
+        
+        <!-- Slide 17: Example 2 - Solution 2 -->
+        <section class="content-section">
+            <h2>Example 2: Solution (Step 2)</h2>
+            <div class="step-box">
+                <h3>Step 2: Process A<sub>1</sub>, A<sub>2</sub>, A<sub>3</sub></h3>
+                
+                <p><strong>Process A<sub>2</sub> (i = 2) and A<sub>3</sub> (i = 3):</strong></p>
+                <pre>
+A<sub>2</sub> &rarr; b
+A<sub>3</sub> &rarr; a
+                </pre>
+                <p>Both are already in GNF. Nothing to do.</p>
+                
+                <p style="margin-top: 20px;"><strong>Process A<sub>1</sub> (i = 1):</strong></p>
+                <pre>
+A<sub>1</sub> &rarr; A<sub>2</sub>A<sub>3</sub>   <span class="comment">(i=1, j=2.  i &lt; j. Leave it.)</span>
+A<sub>1</sub> &rarr; A<sub>4</sub>A<sub>4</sub>   <span class="comment">(i=1, j=4.  i &lt; j. Leave it.)</span>
+                </pre>
+                <p>A<sub>1</sub> is fine for now. We will fix it with back-substitution at the end.</p>
+            </div>
+        </section>
+        
+        <!-- Slide 18: Example 2 - Solution 3 -->
+        <section class="content-section">
+            <h2>Example 2: Solution (Step 3)</h2>
+            <div class="step-box">
+                <h3>Step 3: Process A<sub>4</sub> (i = 4)</h3>
+                <p>We check the rules for A<sub>4</sub>:</p>
+                <pre>
+A<sub>4</sub> &rarr; A<sub>1</sub>A<sub>4</sub>     <span class="comment">(Rule: A<sub>i</sub> &rarr; A<sub>j</sub>&alpha;)</span>
+                </pre>
+                <ul>
+                    <li>Here, <strong>i = 4</strong> and <strong>j = 1</strong>.</li>
+                    <li>Since <strong>i &gt; j</strong>, we must <strong>substitute A<sub>1</sub></strong>.</li>
+                </ul>
+                <p>We replace <span class="highlight">A<sub>1</sub></span> with its productions (<span class="highlight">A<sub>2</sub>A<sub>3</sub> | A<sub>4</sub>A<sub>4</sub></span>):</p>
+                <pre>
+A<sub>4</sub> &rarr; b | (<strong>A<sub>2</sub>A<sub>3</sub> | A<sub>4</sub>A<sub>4</sub></strong>)A<sub>4</sub>
+                </pre>
+                <p>This gives us the new rules for A<sub>4</sub>:</p>
+                <pre class="formula">
+A<sub>4</sub> &rarr; b | A<sub>2</sub>A<sub>3</sub>A<sub>4</sub> | A<sub>4</sub>A<sub>4</sub>A<sub>4</sub>
+                </pre>
+            </div>
+        </section>
+
+        <!-- Slide 19: Example 2 - Solution 4 -->
+        <section class="content-section">
+            <h2>Example 2: Solution (Step 4)</h2>
+            <div class="step-box">
+                <h3>Step 4: Substitute again in A<sub>4</sub></h3>
+                <p>Our new A<sub>4</sub> rules are not in GNF yet:</p>
+                <pre>
+A<sub>4</sub> &rarr; b | <strong>A<sub>2</sub></strong>A<sub>3</sub>A<sub>4</sub> | A<sub>4</sub>A<sub>4</sub>A<sub>4</sub>
+                </pre>
+                <p>The rule <span class="highlight">A<sub>4</sub> &rarr; A<sub>2</sub>A<sub>3</sub>A<sub>4</sub></span> has <strong>i = 4</strong>, <strong>j = 2</strong>. Since <strong>i &gt; j</strong>, we must substitute A<sub>2</sub>.</p>
+                <p>We replace <span class="highlight">A<sub>2</sub></span> with its production (<span class="highlight">b</span>):</p>
+                <pre>
+A<sub>4</sub> &rarr; b | (<strong>b</strong>)A<sub>3</sub>A<sub>4</sub> | A<sub>4</sub>A<sub>4</sub>A<sub>4</sub>
+                </pre>
+                <p>Now, our A<sub>4</sub> rules are:</p>
+                <pre class="formula">
+A<sub>4</sub> &rarr; b | bA<sub>3</sub>A<sub>4</sub> | A<sub>4</sub>A<sub>4</sub>A<sub>4</sub>
+                </pre>
+            </div>
+        </section>
+
+        <!-- Slide 20: Example 2 - Solution 5 -->
+        <section class="content-section">
+            <h2>Example 2: Solution (Step 5)</h2>
+            <div class="step-box">
+                <h3>Step 5: Eliminate Left Recursion in A<sub>4</sub></h3>
+                <p>Our A<sub>4</sub> rules still have a problem:</p>
+                <pre>
+A<sub>4</sub> &rarr; <strong>A<sub>4</sub></strong>A<sub>4</sub>A<sub>4</sub> | b | bA<sub>3</sub>A<sub>4</sub>
+                </pre>
+                <p>This is in the form <span class="highlight">A &rarr; A&alpha; | &beta;</span> where:</p>
+                <ul>
+                    <li>A = A<sub>4</sub></li>
+                    <li>&alpha; = A<sub>4</sub>A<sub>4</sub></li>
+                    <li>&beta; = b | bA<sub>3</sub>A<sub>4</sub></li>
+                </ul>
+                <p>We apply the formula (using new variable <strong>Z</strong> or <strong>A<sub>4</sub>'</strong>):</p>
+                <pre class="formula">
+A<sub>4</sub> &rarr; bZ | bA<sub>3</sub>A<sub>4</sub>Z
+Z &rarr; A<sub>4</sub>A<sub>4</sub>Z | &epsilon;
+                </pre>
+            </div>
+        </section>
+        
+        <!-- Slide 21: Example 2 - Solution 6 -->
+        <section class="content-section">
+            <h2>Example 2: Solution (Step 6)</h2>
+            <div class="step-box">
+                <h3>Step 6: Back-Substitution</h3>
+                <p>Our A<sub>1</sub> rules are still not in GNF. We substitute our new GNF rules for A<sub>2</sub>, A<sub>3</sub>, and A<sub>4</sub>.</p>
+                <pre>
+A<sub>1</sub> &rarr; <strong>A<sub>2</sub></strong>A<sub>3</sub> | <strong>A<sub>4</sub></strong>A<sub>4</sub>
+                </pre>
+                <p>Substitute <span class="highlight">A<sub>2</sub> &rarr; b</span>:</p>
+                <pre>
+A<sub>1</sub> &rarr; <strong>b</strong>A<sub>3</sub> | A<sub>4</sub>A<sub>4</sub>
+                </pre>
+                <p>Substitute new A<sub>4</sub> rules (<span class="highlight">bZ | bA<sub>3</sub>A<sub>4</sub>Z</span>):</p>
+                <pre>
+A<sub>1</sub> &rarr; bA<sub>3</sub> | (<strong>bZ | bA<sub>3</sub>A<sub>4</sub>Z</strong>)A<sub>4</sub>
+                </pre>
+                <p>This gives our final GNF rules for A<sub>1</sub>:</p>
+                <pre class="formula">
+A<sub>1</sub> &rarr; bA<sub>3</sub> | bZA<sub>4</sub> | bA<sub>3</sub>A<sub>4</sub>ZA<sub>4</sub>
+                </pre>
+            </div>
+        </section>
+
+        <!-- Slide 22: Example 2 - Final GNF -->
+        <section class="content-section">
+            <h2>Example 2: Final GNF Grammar</h2>
+            <p>After all substitutions, this is the final grammar in Greibach Normal Form.</p>
+            <div class="grammar-box">
+                <span class="good">A<sub>1</sub> &rarr; bA<sub>3</sub> | bZA<sub>4</sub> | bA<sub>3</sub>A<sub>4</sub>ZA<sub>4</sub></span>
+                <br>
+                <span class="good">A<sub>2</sub> &rarr; b</span>
+                <br>
+                <span class="good">A<sub>3</sub> &rarr; a</span>
+                <br>
+                <span class="good">A<sub>4</sub> &rarr; bZ | bA<sub>3</sub>A<sub>4</sub>Z</span>
+                <br>
+                <span class="good">Z &rarr; A<sub>4</sub>A<sub>4</sub>Z | &epsilon;</span>
+            </div>
+            <p style="margin-top: 20px;">(Again, the Z rule is not fully in GNF and would be substituted, but this is the direct result of the algorithm's steps.)</p>
+        </section>
+
+        <!-- Slide 23: End Slide -->
+        <section class="content-section title-section">
+            <h1>Thank You</h1>
+            <p class="subtitle">Questions?</p>
+        </section>
+
+    </main>
+
+</body>
+</html>
