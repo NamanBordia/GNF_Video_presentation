@@ -19,17 +19,23 @@
             padding: 0;
         }
 
+        html {
+            scroll-behavior: smooth; /* Smooth scroll for any anchor links */
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f0f4f8;
             color: #333;
             line-height: 1.6;
             padding: 20px;
+            overflow-x: hidden; /* Prevent horizontal scroll from animations */
         }
         
         main {
             max-width: 1280px;
             margin: 20px auto;
+            position: relative; /* Added for scroll follower positioning */
         }
 
         .presentation-header {
@@ -65,7 +71,24 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             padding: 40px 60px;
             margin-bottom: 40px;
+            /* Adjust padding to not overlap with scroll follower */
+            padding-left: 80px;
+
+            /* --- ANIMATION --- */
+            /* Start state: hidden and slightly down */
+            opacity: 0;
+            transform: translateY(30px);
+            /* Smooth transition for the properties */
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
         }
+
+        /* --- ANIMATION "ON" STATE --- */
+        /* This class will be added by JavaScript when the element is in view */
+        .content-section.is-visible {
+            opacity: 1; /* Fade in */
+            transform: translateY(0); /* Slide up to original position */
+        }
+
 
         /* --- Content Styling --- */
         .content-section h1 {
@@ -102,6 +125,7 @@
             text-align: center;
             background: linear-gradient(135deg, #004a7c 0%, #0077b6 100%);
             padding: 60px;
+            padding-left: 60px; /* Override padding for title */
         }
         .title-section h1 {
             color: #fff;
@@ -215,6 +239,123 @@
             font-weight: 600;
             color: #c92a2a;
         }
+
+        /* --- NEW: Scroll Follower Animation --- */
+        .scroll-progress-rail {
+            position: absolute;
+            top: 0;
+            left: 30px; /* Gutter from the left edge */
+            width: 4px;
+            height: 100%;
+            background: #e0e7ff;
+            z-index: 99;
+        }
+
+        #scroll-follower-icon {
+            position: absolute;
+            top: 0; /* This will be set by JavaScript */
+            left: 50%; /* Center on the 4px rail */
+            transform: translateX(-50%); /* ... */
+            
+            width: 50px;
+            height: 50px;
+            background: #004a7c;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            /* Use a fast, linear transition to make it feel responsive */
+            transition: top 0.05s linear; 
+        }
+        
+        #scroll-follower-icon i {
+             /* Add a subtle spin animation */
+             animation: spin 8s linear infinite;
+        }
+        
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        /* --- End of Scroll Follower --- */
+
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .content-section {
+                padding: 30px 20px;
+                 padding-left: 40px; /* Smaller padding for mobile */
+            }
+            .content-section h1 {
+                font-size: 48px;
+            }
+            .title-section h1 {
+                font-size: 56px;
+            }
+             .title-section {
+                padding-left: 20px; /* Override padding for title */
+            }
+            .content-section h2 {
+                font-size: 36px;
+            }
+            .content-section p, .content-section li {
+                font-size: 18px;
+            }
+            .content-section .subtitle {
+                font-size: 22px;
+            }
+            .title-section .subtitle {
+                font-size: 24px;
+            }
+            .grammar-box, pre {
+                font-size: 18px;
+                line-height: 1.6;
+            }
+            pre {
+                font-size: 16px;
+            }
+            .grammar-box .comment {
+                font-size: 16px;
+            }
+            .step-box h3 {
+                font-size: 24px;
+            }
+            .step-box p {
+                font-size: 18px;
+            }
+            .step-box .formula {
+                font-size: 18px;
+            }
+            .presentation-header {
+                padding: 20px;
+                text-align: center;
+            }
+            .presentation-header p {
+                font-size: 16px;
+            }
+
+            /* Adjust scroll follower for mobile */
+            .scroll-progress-rail {
+                left: 10px;
+            }
+            #scroll-follower-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -225,6 +366,13 @@
     </header>
 
     <main id="presentation-content">
+
+        <!-- NEW: Scroll Follower HTML -->
+        <div class="scroll-progress-rail">
+            <div id="scroll-follower-icon">
+                <i class="fa-solid fa-cogs"></i>
+            </div>
+        </div>
 
         <!-- Slide 1: Title Slide -->
         <section class="content-section title-section">
@@ -376,8 +524,8 @@ A = A<sub>2</sub>
                 </pre>
                 <p>The new grammar is:</p>
                 <pre>
-A<sub>1</sub> &rarr; A<sub>2</sub>A<sub>2</sub> | 0     <span class="comment">(A<sub>1</sub> &rarr; 0 is already in GNF)</span>
-A<sub>2</sub> &rarr; A<sub>1</sub>A<sub>1</sub> | 1     <span class="comment">(A<sub>2</sub> &rarr; 1 is already in GNF)</span>
+A<sub>1</sub> &rarr; A<sub>2</sub>A<sub>2</sub> | 0    <span class="comment">(A<sub>1</sub> &rarr; 0 is already in GNF)</span>
+A<sub>2</sub> &rarr; A<sub>1</sub>A<sub>1</sub> | 1    <span class="comment">(A<sub>2</sub> &rarr; 1 is already in GNF)</span>
                 </pre>
             </div>
         </section>
@@ -389,7 +537,7 @@ A<sub>2</sub> &rarr; A<sub>1</sub>A<sub>1</sub> | 1     <span class="comment">(A
                 <h3>Step 2: Process A<sub>1</sub> (i = 1)</h3>
                 <p>We check the rules for A<sub>1</sub>:</p>
                 <pre>
-A<sub>1</sub> &rarr; A<sub>2</sub>A<sub>2</sub>     <span class="comment">(Rule: A<sub>i</sub> &rarr; A<sub>j</sub>&alpha;)</span>
+A<sub>1</sub> &rarr; A<sub>2</sub>A<sub>2</sub>    <span class="comment">(Rule: A<sub>i</sub> &rarr; A<sub>j</sub>&alpha;)</span>
                 </pre>
                 <ul>
                     <li>Here, <strong>i = 1</strong> and <strong>j = 2</strong>.</li>
@@ -405,7 +553,7 @@ A<sub>1</sub> &rarr; A<sub>2</sub>A<sub>2</sub>     <span class="comment">(Rule:
                 <h3>Step 3: Process A<sub>2</sub> (i = 2)</h3>
                 <p>We check the rules for A<sub>2</sub>:</p>
                 <pre>
-A<sub>2</sub> &rarr; A<sub>1</sub>A<sub>1</sub>     <span class="comment">(Rule: A<sub>i</sub> &rarr; A<sub>j</sub>&alpha;)</span>
+A<sub>2</sub> &rarr; A<sub>1</sub>A<sub>1</sub>    <span class="comment">(Rule: A<sub>i</sub> &rarr; A<sub>j</sub>&alpha;)</span>
                 </pre>
                 <ul>
                     <li>Here, <strong>i = 2</strong> and <strong>j = 1</strong>.</li>
@@ -510,7 +658,7 @@ B = A<sub>4</sub>
                 <p>The new grammar is:</p>
                 <pre>
 A<sub>1</sub> &rarr; A<sub>2</sub>A<sub>3</sub> | A<sub>4</sub>A<sub>4</sub>
-A<sub>4</sub> &rarr; b | A<sub>1</sub>A<sub>4</sub>      <span class="comment">(A<sub>4</sub> &rarr; b is GNF)</span>
+A<sub>4</sub> &rarr; b | A<sub>1</sub>A<sub>4</sub>     <span class="comment">(A<sub>4</sub> &rarr; b is GNF)</span>
 A<sub>2</sub> &rarr; b              <span class="comment">(Already GNF)</span>
 A<sub>3</sub> &rarr; a              <span class="comment">(Already GNF)</span>
                 </pre>
@@ -546,7 +694,7 @@ A<sub>1</sub> &rarr; A<sub>4</sub>A<sub>4</sub>   <span class="comment">(i=1, j=
                 <h3>Step 3: Process A<sub>4</sub> (i = 4)</h3>
                 <p>We check the rules for A<sub>4</sub>:</p>
                 <pre>
-A<sub>4</sub> &rarr; A<sub>1</sub>A<sub>4</sub>     <span class="comment">(Rule: A<sub>i</sub> &rarr; A<sub>j</sub>&alpha;)</span>
+A<sub>4</sub> &rarr; A<sub>1</sub>A<sub>4</sub>    <span class="comment">(Rule: A<sub>i</sub> &rarr; A<sub>j</sub>&alpha;)</span>
                 </pre>
                 <ul>
                     <li>Here, <strong>i = 4</strong> and <strong>j = 1</strong>.</li>
@@ -656,6 +804,74 @@ A<sub>1</sub> &rarr; bA<sub>3</sub> | bZA<sub>4</sub> | bA<sub>3</sub>A<sub>4</s
         </section>
 
     </main>
+
+    <!-- JavaScript for Animations -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 1. Fade-in-on-scroll animation ---
+            const sections = document.querySelectorAll('.content-section');
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observerCallback = (entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            };
+
+            const observer = new IntersectionObserver(observerCallback, observerOptions);
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // --- 2. Scroll follower animation ---
+            const followerIcon = document.getElementById('scroll-follower-icon');
+            const mainContent = document.getElementById('presentation-content');
+            let isTicking = false;
+
+            function updateScrollFollower() {
+                let scrollTop = window.scrollY;
+                // Total scrollable height of the entire page
+                let totalScrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+                
+                if (totalScrollHeight <= 0) {
+                    isTicking = false;
+                    return; // No scroll
+                }
+
+                // Fraction (0 to 1) of how far the user has scrolled the page
+                let scrollFraction = scrollTop / totalScrollHeight;
+
+                // Total distance the icon can travel (height of main content - icon height)
+                let iconTravelDistance = mainContent.offsetHeight - 50; // 50px icon height
+                
+                // Calculate new top position
+                let iconTop = scrollFraction * iconTravelDistance;
+                
+                followerIcon.style.top = iconTop + 'px';
+                isTicking = false; // Allow next frame
+            }
+
+            window.addEventListener('scroll', () => {
+                if (!isTicking) {
+                    window.requestAnimationFrame(updateScrollFollower);
+                    isTicking = true; // Prevent multiple requests per frame
+                }
+            });
+
+            // Initial call to position icon correctly on load
+            if (!isTicking) {
+                window.requestAnimationFrame(updateScrollFollower);
+                isTicking = true;
+            }
+        });
+    </script>
 
 </body>
 </html>
